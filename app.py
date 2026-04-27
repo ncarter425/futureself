@@ -6,15 +6,13 @@ import plotly.graph_objects as go
 from st_supabase_connection import SupabaseConnection # Install with: pip install st-supabase-connection
 
 # 1. DATABASE CONNECTION
-# On your phone/cloud, these will come from your 'Secrets' settings
-conn = st.connection("supabase", type=SupabaseConnection)
+# This looks for [connections.supabase] in your Secrets
+try:
+    conn = st.connection("supabase", type=SupabaseConnection)
+except Exception:
+    st.error("Missing Database Secrets. Please check your Streamlit Cloud Settings.")
+    st.stop()
 
-def load_habits():
-    rows = conn.query("*", table="habits", ttl=0).execute()
-    return pd.DataFrame(rows.data) if rows.data else pd.DataFrame(columns=["is_stopped", "habit_name", "monthly_cost", "years_active", "habit_type"])
-
-def save_habit(name, cost, years, h_type):
-    conn.table("habits").insert({"habit_name": name, "monthly_cost": cost, "years_active": years, "habit_type": h_type, "is_stopped": False}).execute()
 
 # 2. UI SETUP
 st.set_page_config(page_title="FutureSelf", layout="wide")
